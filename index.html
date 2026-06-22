@@ -536,10 +536,10 @@
     <span class="day-hours-label">Day Hours</span>
     <div class="hours-inputs">
       <label>Started</label>
-      <input type="time" id="dayStart" onchange="saveDayHours()">
+      <input type="time" id="dayStart" step="900" onchange="saveDayHours()">
       <span class="hours-sep">—</span>
       <label>Ended</label>
-      <input type="time" id="dayEnd" onchange="saveDayHours()">
+      <input type="time" id="dayEnd" step="900" onchange="saveDayHours()">
     </div>
     <span class="day-total-hours" id="dayTotalHours"></span>
   </div>
