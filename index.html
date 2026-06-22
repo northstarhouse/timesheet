@@ -36,42 +36,64 @@ body {
 /* ── Header ── */
 .app-header {
   background: var(--header);
-  padding: 0 20px;
-  height: 56px;
+  padding: 0 18px;
+  height: 52px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   position: sticky;
   top: 0;
   z-index: 50;
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
-.app-header img { height: 32px; width: auto; filter: brightness(0) invert(1); opacity: 0.92; }
+.app-header img { height: 30px; width: auto; filter: brightness(0) invert(1); opacity: 0.9; }
 
 .app-header h1 {
-  font-family: 'Inter', sans-serif;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #f8f4ec;
-  letter-spacing: 0.2px;
 }
 
 .header-spacer { flex: 1; }
 
-.sync-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.3);
-  transition: background 0.3s;
+.employee-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.sync-dot.saving  { background: #f0c040; }
-.sync-dot.saved   { background: var(--green); }
-.sync-dot.error   { background: var(--red); }
+.employee-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+#employeeName {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 5px;
+  color: #f8f4ec;
+  font-size: 12px;
+  font-family: inherit;
+  padding: 4px 8px;
+  outline: none;
+  width: 130px;
+  transition: background 0.12s;
+}
+
+#employeeName::placeholder { color: rgba(255,255,255,0.35); }
+#employeeName:focus { background: rgba(255,255,255,0.2); }
+
+.sync-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  transition: background 0.3s;
+  margin-left: 4px;
+}
+.sync-dot.saving { background: #f0c040; }
+.sync-dot.saved  { background: var(--green); }
+.sync-dot.error  { background: var(--red); }
 
 /* ── Body ── */
-.body { max-width: 600px; margin: 0; padding: 0 0 64px; }
+.body { max-width: 600px; margin: 0; padding: 0 0 68px; }
 
 /* ── Add entry card ── */
 .add-card {
@@ -81,10 +103,10 @@ body {
   margin-bottom: 8px;
 }
 
-.add-what {
-  font-size: 13px;
+.add-label {
+  font-size: 12px;
   color: var(--text-3);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   font-weight: 500;
 }
 
@@ -96,7 +118,7 @@ textarea.what-input {
   color: var(--text);
   font-family: inherit;
   resize: none;
-  min-height: 40px;
+  min-height: 38px;
   background: transparent;
   line-height: 1.4;
   margin-bottom: 10px;
@@ -108,37 +130,47 @@ textarea.what-input::placeholder { color: var(--text-3); }
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
-.add-row-left { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
-
+/* ── Duration selects ── */
 .dur-pill {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 5px 10px;
-  height: 32px;
+  padding: 0 10px;
+  height: 34px;
 }
 
-.dur-pill input {
-  border: none; outline: none; background: transparent;
-  font-size: 13px; color: var(--text);
-  font-family: inherit; width: 80px;
+.dur-pill:focus-within { border-color: var(--gold); }
+
+.dur-sel {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  text-align: center;
 }
 
-.dur-pill input::placeholder { color: var(--text-3); }
+#durH, #editDurH { width: 28px; }
+#durM, #editDurM { width: 26px; }
 
-.dur-icon { font-size: 9px; color: var(--gold); }
+.dur-sep { font-size: 12px; color: var(--text-3); }
 
 select.cat-pill {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 0 9px;
-  height: 32px;
+  height: 34px;
   font-size: 12px;
   color: var(--text-2);
   font-family: inherit;
@@ -150,72 +182,128 @@ select.cat-pill {
   background: var(--header);
   color: #fff;
   border: none;
-  width: 36px; height: 36px;
+  width: 34px; height: 34px;
   border-radius: 50%;
   font-size: 20px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.12s;
   flex-shrink: 0;
-  line-height: 1;
+  margin-left: auto;
 }
 
 .add-btn:hover { background: var(--header-dk); }
 
-/* ── Week total ── */
-.week-total {
+/* ── Date nav ── */
+.date-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
   background: var(--surface);
-  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  padding: 12px 18px;
+  margin-bottom: 2px;
+}
+
+.nav-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  width: 26px; height: 26px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.12s;
+}
+
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+.date-nav-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+
+.today-btn {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  background: var(--gold-lt);
+  color: var(--gold);
+  border: 1px solid #d4b88a;
+  padding: 3px 9px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.12s;
+}
+
+.today-btn:hover { background: #e8dac8; }
+
+/* ── Pay period / week total bar ── */
+.period-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 9px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2px;
+  gap: 12px;
 }
 
-.week-total-label {
+.period-label {
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text-2);
-}
-
-.week-total-val {
-  font-size: 14px;
   font-weight: 600;
-  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-3);
 }
 
-/* ── Day section ── */
+.period-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.period-range {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-left: auto;
+}
+
+/* ── Day header ── */
 .day-section { margin-bottom: 2px; }
 
 .day-header {
   background: var(--surface);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  padding: 10px 18px;
+  padding: 9px 18px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.day-icon { font-size: 12px; color: var(--text-3); }
-
 .day-name {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: var(--text-2);
   flex: 1;
+  min-width: 100px;
 }
 
 .day-hours-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  flex-wrap: wrap;
 }
 
 .day-hours-row label { font-size: 11px; color: var(--text-3); }
@@ -234,46 +322,43 @@ select.cat-pill {
   font-size: 12px;
   outline: none;
   font-family: inherit;
-  padding: 2px 2px;
+  padding: 2px 1px;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
-  transition: border-color 0.12s, color 0.12s;
+  transition: border-color 0.12s;
 }
 
-.time-pick select:focus { border-color: var(--gold); color: var(--text); }
+.time-pick select:focus { border-color: var(--gold); }
 
-#dayStartH, #dayEndH { width: 28px; text-align: center; }
-#dayStartM, #dayEndM { width: 24px; text-align: center; }
-#dayStartA, #dayEndA { width: 30px; text-align: center; }
+#dayStartH, #dayEndH { width: 24px; text-align: center; }
+#dayStartM, #dayEndM { width: 22px; text-align: center; }
+#dayStartA, #dayEndA { width: 28px; text-align: center; }
 
-.time-colon { font-size: 12px; color: var(--text-3); line-height: 1; padding-bottom: 1px; }
-
-.day-sep { color: var(--text-3); font-size: 11px; }
+.time-colon { font-size: 11px; color: var(--text-3); }
+.day-sep    { font-size: 11px; color: var(--text-3); }
 
 .day-total {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-2);
-  margin-left: 8px;
 }
 
-/* ── Entry row ── */
+/* ── Entry rows ── */
 .entry-row {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: 12px 18px;
+  padding: 11px 18px;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  cursor: default;
+  gap: 10px;
   transition: background 0.1s;
 }
 
 .entry-row:hover { background: #fafafa; }
 
 .entry-dot {
-  width: 8px; height: 8px;
+  width: 7px; height: 7px;
   border-radius: 50%;
   background: var(--gold);
   margin-top: 5px;
@@ -285,14 +370,14 @@ select.cat-pill {
 .entry-desc {
   font-size: 14px;
   color: var(--text);
-  line-height: 1.4;
+  line-height: 1.45;
   word-break: break-word;
 }
 
 .entry-tags {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   margin-top: 5px;
   flex-wrap: wrap;
 }
@@ -300,32 +385,31 @@ select.cat-pill {
 .tag {
   font-size: 10px;
   font-weight: 600;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 4px;
-  letter-spacing: 0.2px;
   text-transform: capitalize;
 }
 
-.cat-general { background: #f0efed; color: #7a756e; }
-.cat-meeting { background: #eaf5ee; color: #3a7d52; }
-.cat-design  { background: #f0ecf8; color: #6b44a0; }
-.cat-dev     { background: #eaf0f8; color: #2a5a9a; }
-.cat-review  { background: #fdf3e8; color: #a05a1a; }
-.cat-admin      { background: #fceaea; color: #a02828; }
-.cat-marketing  { background: #e8f4fd; color: #1a6a9a; }
+.cat-general   { background: #f0efed; color: #7a756e; }
+.cat-meeting   { background: #eaf5ee; color: #3a7d52; }
+.cat-design    { background: #f0ecf8; color: #6b44a0; }
+.cat-dev       { background: #eaf0f8; color: #2a5a9a; }
+.cat-review    { background: #fdf3e8; color: #a05a1a; }
+.cat-admin     { background: #fceaea; color: #a02828; }
+.cat-marketing { background: #e8f4fd; color: #1a6a9a; }
 
 .entry-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .entry-dur {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text);
-  min-width: 44px;
+  min-width: 36px;
   text-align: right;
 }
 
@@ -368,9 +452,9 @@ select.cat-pill {
   bottom: 0; left: 0; right: 0;
   background: var(--surface);
   border-top: 1px solid var(--border);
-  padding: 10px 18px;
+  padding: 9px 18px;
   display: flex;
-  gap: 8px;
+  gap: 7px;
   align-items: center;
   max-width: 600px;
   overflow-x: auto;
@@ -383,7 +467,7 @@ select.cat-pill {
   background: var(--bg);
   border: 1px solid var(--border);
   color: var(--text-2);
-  padding: 7px 13px;
+  padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
@@ -391,62 +475,21 @@ select.cat-pill {
   font-family: inherit;
   transition: all 0.12s;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .exp-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-lt); }
 .exp-btn.primary { background: var(--header); border-color: var(--header); color: #fff; }
-.exp-btn.primary:hover { background: var(--header-dk); border-color: var(--header-dk); }
-.exp-btn.danger { margin-left: auto; }
-.exp-btn.danger:hover { border-color: var(--red); color: var(--red); background: #fceaea; }
+.exp-btn.primary:hover { background: var(--header-dk); border-color: var(--header-dk); color: #fff; }
 
-/* ── Date nav ── */
-.date-nav {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  padding: 10px 18px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 2px;
-}
-
-.nav-btn {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text-2);
-  width: 28px; height: 28px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.12s;
-}
-
-.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-.date-nav-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.today-btn {
+.period-badge {
   font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  background: var(--gold-lt);
-  color: var(--gold);
-  border: 1px solid #d4b88a;
-  padding: 3px 9px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.12s;
+  color: var(--text-3);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-right: 2px;
 }
-
-.today-btn:hover { background: #e8dac8; }
 
 /* ── Modal ── */
 .modal-overlay {
@@ -467,8 +510,7 @@ select.cat-pill {
 }
 
 .modal h2 {
-  font-family: 'Inter', sans-serif;
-  font-size: 17px; font-weight: 700;
+  font-size: 16px; font-weight: 700;
   color: var(--text); margin-bottom: 14px;
 }
 
@@ -483,9 +525,7 @@ select.cat-pill {
 }
 
 .modal textarea:focus { border-color: var(--gold); }
-
-.modal-row { display: flex; gap: 8px; margin-bottom: 14px; }
-
+.modal-row { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; }
 .modal-footer { display: flex; justify-content: flex-end; gap: 8px; }
 
 .modal-footer button {
@@ -497,40 +537,29 @@ select.cat-pill {
 }
 
 .modal-footer .save-btn { background: var(--header); border-color: var(--header); color: #fff; }
-.modal-footer .save-btn:hover { background: var(--header-dk); }
+.modal-footer .save-btn:hover { background: var(--header-dk); color: #fff; }
 .modal-footer button:hover { border-color: var(--gold); color: var(--gold); }
-.modal-footer .save-btn:hover { color: #fff; }
+.modal-footer .save-btn:hover { border-color: var(--header-dk); }
 
 /* ── Mobile ── */
 @media (max-width: 540px) {
   .body { padding-bottom: 76px; }
-
   .add-card { padding: 12px 14px; }
-  textarea.what-input { font-size: 16px; } /* prevent iOS zoom */
-  .add-row { flex-wrap: wrap; gap: 8px; }
-  .add-row-left { flex-wrap: wrap; }
-  .add-btn { width: 44px; height: 44px; font-size: 22px; margin-left: auto; }
-
-  /* Day header: stack into two rows */
-  .day-header { flex-wrap: wrap; gap: 6px; padding: 10px 14px; }
+  textarea.what-input { font-size: 16px; }
+  .add-btn { width: 42px; height: 42px; }
+  .day-header { padding: 9px 14px; }
   .day-name { width: 100%; flex: none; }
-  .day-hours-row { flex-wrap: wrap; gap: 6px; }
-  .day-total { margin-left: 0; }
-
-  /* Bigger touch targets on time selects */
-  .time-pick select { font-size: 14px; padding: 4px 2px; }
-  #dayStartH, #dayEndH { width: 32px; }
-  #dayStartM, #dayEndM { width: 28px; }
-  #dayStartA, #dayEndA { width: 36px; }
-
-  /* Entry actions always visible on touch */
+  .day-hours-row { gap: 4px; }
+  .time-pick select { font-size: 13px; padding: 3px 1px; }
+  #dayStartH, #dayEndH { width: 28px; }
+  #dayStartM, #dayEndM { width: 26px; }
+  #dayStartA, #dayEndA { width: 32px; }
   .entry-actions { opacity: 1; }
-  .entry-actions button { padding: 6px 8px; font-size: 14px; }
-
-  .entry-row { padding: 12px 14px; }
-  .week-total, .date-nav { padding: 10px 14px; }
-  .export-bar { padding: 10px 14px; }
-  .exp-btn { padding: 8px 12px; font-size: 12px; flex-shrink: 0; }
+  .entry-actions button { padding: 6px 7px; font-size: 13px; }
+  .entry-row { padding: 11px 14px; }
+  .date-nav, .period-bar { padding: 9px 14px; }
+  .export-bar { padding: 9px 14px; }
+  #employeeName { width: 100px; }
 }
 
 /* ── Toast ── */
@@ -542,7 +571,6 @@ select.cat-pill {
   opacity: 0; transform: translateY(4px);
   transition: all 0.15s; pointer-events: none; z-index: 300;
 }
-
 .toast.show { opacity: 1; transform: translateY(0); }
 </style>
 </head>
@@ -553,31 +581,43 @@ select.cat-pill {
   <img src="./logo.png" alt="" onerror="this.style.display='none'">
   <h1>Timesheet</h1>
   <div class="header-spacer"></div>
+  <div class="employee-wrap">
+    <span class="employee-label">Name</span>
+    <input id="employeeName" type="text" placeholder="Your name" autocomplete="name">
+  </div>
   <div class="sync-dot" id="syncDot"></div>
 </div>
 
 <div class="body">
 
-  <!-- Add entry card -->
+  <!-- Add entry -->
   <div class="add-card">
-    <div class="add-what">What did you work on?</div>
+    <div class="add-label">What did you work on?</div>
     <textarea class="what-input" id="taskInput" placeholder="Describe your task…" rows="2"></textarea>
     <div class="add-row">
-      <div class="add-row-left">
-        <div class="dur-pill">
-          <span class="dur-icon">&#9679;</span>
-          <input type="text" id="durationInput" placeholder="1hr, 30min…">
-        </div>
-        <select class="cat-pill" id="categorySelect">
-          <option value="general">General</option>
-          <option value="meeting">Meeting</option>
-          <option value="dev">Development</option>
-          <option value="design">Design</option>
-          <option value="review">Review</option>
-          <option value="admin">Admin</option>
-          <option value="marketing">Marketing</option>
+      <div class="dur-pill">
+        <select id="durH" class="dur-sel">
+          <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+          <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+          <option value="6">6</option><option value="7">7</option><option value="8">8</option>
+          <option value="9">9</option><option value="10">10</option>
         </select>
+        <span class="dur-sep">h</span>
+        <select id="durM" class="dur-sel">
+          <option value="00">00</option><option value="15">15</option>
+          <option value="30">30</option><option value="45">45</option>
+        </select>
+        <span class="dur-sep">m</span>
       </div>
+      <select class="cat-pill" id="categorySelect">
+        <option value="general">General</option>
+        <option value="meeting">Meeting</option>
+        <option value="dev">Development</option>
+        <option value="design">Design</option>
+        <option value="review">Review</option>
+        <option value="admin">Admin</option>
+        <option value="marketing">Marketing</option>
+      </select>
       <button class="add-btn" onclick="addEntry()" title="Add entry">+</button>
     </div>
   </div>
@@ -590,16 +630,16 @@ select.cat-pill {
     <button class="nav-btn" onclick="changeDay(1)">&#8250;</button>
   </div>
 
-  <!-- Week total -->
-  <div class="week-total">
-    <span class="week-total-label">This Week Total</span>
-    <span class="week-total-val" id="weekTotal">—</span>
+  <!-- Pay period / week total -->
+  <div class="period-bar">
+    <span class="period-label">Pay Period</span>
+    <span class="period-val" id="periodTotal">—</span>
+    <span class="period-range" id="periodRange"></span>
   </div>
 
   <!-- Day section -->
   <div class="day-section">
     <div class="day-header">
-      <span class="day-icon">&#128197;</span>
       <span class="day-name" id="dayName"></span>
       <div class="day-hours-row">
         <label>In</label>
@@ -607,14 +647,11 @@ select.cat-pill {
           <select id="dayStartH" onchange="saveDayHours()"></select>
           <span class="time-colon">:</span>
           <select id="dayStartM" onchange="saveDayHours()">
-            <option value="00">00</option>
-            <option value="15">15</option>
-            <option value="30">30</option>
-            <option value="45">45</option>
+            <option value="00">00</option><option value="15">15</option>
+            <option value="30">30</option><option value="45">45</option>
           </select>
           <select id="dayStartA" onchange="saveDayHours()">
-            <option value="AM">AM</option>
-            <option value="PM">PM</option>
+            <option value="AM">AM</option><option value="PM">PM</option>
           </select>
         </div>
         <span class="day-sep">›</span>
@@ -623,14 +660,11 @@ select.cat-pill {
           <select id="dayEndH" onchange="saveDayHours()"></select>
           <span class="time-colon">:</span>
           <select id="dayEndM" onchange="saveDayHours()">
-            <option value="00">00</option>
-            <option value="15">15</option>
-            <option value="30">30</option>
-            <option value="45">45</option>
+            <option value="00">00</option><option value="15">15</option>
+            <option value="30">30</option><option value="45">45</option>
           </select>
           <select id="dayEndA" onchange="saveDayHours()">
-            <option value="AM">AM</option>
-            <option value="PM">PM</option>
+            <option value="AM">AM</option><option value="PM">PM</option>
           </select>
         </div>
       </div>
@@ -639,12 +673,12 @@ select.cat-pill {
     <div id="entriesList"></div>
   </div>
 
-  <!-- Export -->
+  <!-- Export bar -->
   <div class="export-bar">
-    <button class="exp-btn primary" onclick="exportExcel()">&#8595; Excel</button>
-    <button class="exp-btn" onclick="exportCSV()">&#8595; CSV</button>
-    <button class="exp-btn" onclick="exportText()">Text</button>
-    <button class="exp-btn" onclick="exportAllExcel()">&#8595; All Days</button>
+    <span class="period-badge" id="exportPeriodLabel"></span>
+    <button class="exp-btn primary" onclick="exportCompiled()">&#8595; Compiled</button>
+    <button class="exp-btn" onclick="exportDetailed()">&#8595; Detailed</button>
+    <button class="exp-btn" onclick="exportCSV()">CSV</button>
   </div>
 
 </div>
@@ -656,8 +690,18 @@ select.cat-pill {
     <textarea id="editText"></textarea>
     <div class="modal-row">
       <div class="dur-pill" style="flex:1;">
-        <span class="dur-icon">&#9679;</span>
-        <input type="text" id="editDuration" placeholder="1hr, 30min…" style="width:100%;">
+        <select id="editDurH" class="dur-sel">
+          <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+          <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+          <option value="6">6</option><option value="7">7</option><option value="8">8</option>
+          <option value="9">9</option><option value="10">10</option>
+        </select>
+        <span class="dur-sep">h</span>
+        <select id="editDurM" class="dur-sel">
+          <option value="00">00</option><option value="15">15</option>
+          <option value="30">30</option><option value="45">45</option>
+        </select>
+        <span class="dur-sep">m</span>
       </div>
       <select class="cat-pill" id="editCategory"></select>
     </div>
@@ -679,7 +723,6 @@ let currentDate = todayKey();
 let editingId   = null;
 let dayCache    = {};
 let dayMeta     = {};
-let weekCache   = null;
 
 // ── Helpers ──────────────────────────────────────────────────────
 function todayKey() {
@@ -696,15 +739,6 @@ function formatDateLabel(key) {
 function shortDayName(key) {
   const [y,m,d] = key.split('-').map(Number);
   return new Date(y, m-1, d).toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }).toUpperCase();
-}
-
-function weekStart(key) {
-  const [y,m,d] = key.split('-').map(Number);
-  const dt = new Date(y, m-1, d);
-  const day = dt.getDay();
-  const diff = dt.getDate() - day + (day === 0 ? -6 : 1);
-  const mon = new Date(dt.setDate(diff));
-  return `${mon.getFullYear()}-${pad(mon.getMonth()+1)}-${pad(mon.getDate())}`;
 }
 
 function parseDuration(str) {
@@ -725,6 +759,58 @@ function formatMins(mins) {
   if (!mins || mins <= 0) return '0m';
   const h = Math.floor(mins/60), m = mins%60;
   return h > 0 ? `${h}h${m > 0 ? ' '+m+'m':''}` : `${m}m`;
+}
+
+function minsToDecimal(mins) {
+  return (mins / 60).toFixed(2);
+}
+
+function formatTime12(t24) {
+  if (!t24) return '';
+  const [h, m] = t24.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return `${h12}:${pad(m)} ${ampm}`;
+}
+
+function getPayPeriod(dateKey) {
+  const [y,m,d] = dateKey.split('-').map(Number);
+  if (d <= 15) {
+    return {
+      start: `${y}-${pad(m)}-01`,
+      end:   `${y}-${pad(m)}-15`,
+      label: `${m}/1 – ${m}/15`
+    };
+  } else {
+    const lastDay = new Date(y, m, 0).getDate();
+    return {
+      start: `${y}-${pad(m)}-16`,
+      end:   `${y}-${pad(m)}-${pad(lastDay)}`,
+      label: `${m}/16 – ${m}/${lastDay}`
+    };
+  }
+}
+
+// ── Duration dropdowns ────────────────────────────────────────────
+function getDur(prefix) {
+  const h = document.getElementById(prefix+'H').value;
+  const m = document.getElementById(prefix+'M').value;
+  if (h === '0' && m === '00') return null;
+  return `${h}:${m}`;
+}
+
+function setDur(prefix, val) {
+  const mins = parseDuration(val || '');
+  const h = Math.min(Math.floor(mins/60), 10);
+  const m = mins % 60;
+  const mSnap = [0,15,30,45].reduce((a,b) => Math.abs(b-m) < Math.abs(a-m) ? b : a);
+  document.getElementById(prefix+'H').value = String(h);
+  document.getElementById(prefix+'M').value = String(mSnap).padStart(2,'0');
+}
+
+function resetDur(prefix) {
+  document.getElementById(prefix+'H').value = '0';
+  document.getElementById(prefix+'M').value = '00';
 }
 
 // ── Sync indicator ────────────────────────────────────────────────
@@ -750,20 +836,19 @@ async function fetchDay(date) {
   syncState('');
 }
 
-async function fetchWeekTotal() {
-  const ws = weekStart(currentDate);
-  const [y,m,d] = ws.split('-').map(Number);
-  const we = new Date(y, m-1, d+6);
-  const weKey = `${we.getFullYear()}-${pad(we.getMonth()+1)}-${pad(we.getDate())}`;
-  const { data } = await sb.from('timesheet_entries').select('duration').gte('entry_date', ws).lte('entry_date', weKey);
-  weekCache = (data||[]).reduce((s,r) => s + parseDuration(r.duration), 0);
-  document.getElementById('weekTotal').textContent = formatMins(weekCache);
+async function fetchPeriodTotal() {
+  const { start, end, label } = getPayPeriod(currentDate);
+  const { data } = await sb.from('timesheet_entries').select('duration').gte('entry_date', start).lte('entry_date', end);
+  const total = (data||[]).reduce((s,r) => s + parseDuration(r.duration), 0);
+  document.getElementById('periodTotal').textContent = formatMins(total);
+  document.getElementById('periodRange').textContent = label;
+  document.getElementById('exportPeriodLabel').textContent = label;
 }
 
 function getDayEntries() { return dayCache[currentDate] || []; }
 function getDayMeta()    { return dayMeta[currentDate]  || {}; }
 
-// ── Custom time picker helpers ────────────────────────────────────
+// ── Time picker ───────────────────────────────────────────────────
 function buildHourOptions() {
   return Array.from({length:12}, (_,i) => {
     const v = String(i+1);
@@ -771,7 +856,6 @@ function buildHourOptions() {
   }).join('');
 }
 
-// "HH:MM" 24h → picker fields
 function setTimePicker(prefix, val24) {
   if (!val24) return;
   const [h24,m] = val24.split(':').map(Number);
@@ -783,7 +867,6 @@ function setTimePicker(prefix, val24) {
   document.getElementById(prefix+'A').value = ampm;
 }
 
-// picker fields → "HH:MM" 24h
 function getTimePicker(prefix) {
   const h12 = parseInt(document.getElementById(prefix+'H').value);
   const m   = document.getElementById(prefix+'M').value;
@@ -828,14 +911,14 @@ async function changeDay(delta) {
   const nd = new Date(y, m-1, d+delta);
   currentDate = `${nd.getFullYear()}-${pad(nd.getMonth()+1)}-${pad(nd.getDate())}`;
   if (!dayCache[currentDate]) await fetchDay(currentDate);
-  fetchWeekTotal();
+  fetchPeriodTotal();
   render();
 }
 
 async function goToday() {
   currentDate = todayKey();
   if (!dayCache[currentDate]) await fetchDay(currentDate);
-  fetchWeekTotal();
+  fetchPeriodTotal();
   render();
 }
 
@@ -843,21 +926,21 @@ async function goToday() {
 async function addEntry() {
   const text = document.getElementById('taskInput').value.trim();
   if (!text) { toast('Write what you worked on first.'); return; }
-  const duration = document.getElementById('durationInput').value.trim();
+  const duration = getDur('dur');
   const cat      = document.getElementById('categorySelect').value;
   syncState('saving');
   const { data, error } = await sb.from('timesheet_entries').insert({
     entry_date: currentDate, description: text,
-    duration: duration || null, category: cat
+    duration: duration, category: cat
   }).select().single();
   if (error) { syncState('error'); toast('Save failed'); return; }
   if (!dayCache[currentDate]) dayCache[currentDate] = [];
   dayCache[currentDate].push(rowToEntry(data));
-  document.getElementById('taskInput').value     = '';
-  document.getElementById('durationInput').value = '';
+  document.getElementById('taskInput').value = '';
+  resetDur('dur');
   syncState('saved');
   render();
-  fetchWeekTotal();
+  fetchPeriodTotal();
   toast('Entry added');
 }
 
@@ -869,7 +952,7 @@ async function deleteEntry(id) {
   dayCache[currentDate] = getDayEntries().filter(e => e.id !== id);
   syncState('saved');
   render();
-  fetchWeekTotal();
+  fetchPeriodTotal();
 }
 
 // ── Edit ──────────────────────────────────────────────────────────
@@ -877,8 +960,8 @@ function openEdit(id) {
   const entry = getDayEntries().find(e => e.id === id);
   if (!entry) return;
   editingId = id;
-  document.getElementById('editText').value     = entry.text;
-  document.getElementById('editDuration').value = entry.duration || '';
+  document.getElementById('editText').value = entry.text;
+  setDur('editDur', entry.duration);
   const sel = document.getElementById('editCategory');
   sel.innerHTML = document.getElementById('categorySelect').innerHTML;
   sel.value = entry.cat;
@@ -891,7 +974,7 @@ async function saveEdit() {
   if (!text) return;
   const updates = {
     description: text,
-    duration:    document.getElementById('editDuration').value.trim() || null,
+    duration:    getDur('editDur'),
     category:    document.getElementById('editCategory').value
   };
   syncState('saving');
@@ -900,24 +983,12 @@ async function saveEdit() {
   dayCache[currentDate] = getDayEntries().map(e =>
     e.id !== editingId ? e : { ...e, text: updates.description, duration: updates.duration||'', cat: updates.category }
   );
-  closeModal(); syncState('saved'); render(); fetchWeekTotal(); toast('Entry updated');
+  closeModal(); syncState('saved'); render(); fetchPeriodTotal(); toast('Entry updated');
 }
 
 function closeModal() {
   document.getElementById('editModal').classList.remove('show');
   editingId = null;
-}
-
-// ── Clear ─────────────────────────────────────────────────────────
-async function clearDay() {
-  const entries = getDayEntries();
-  if (!entries.length) { toast('Nothing to clear.'); return; }
-  if (!confirm(`Delete all ${entries.length} entries for ${currentDate}?`)) return;
-  syncState('saving');
-  const { error } = await sb.from('timesheet_entries').delete().eq('entry_date', currentDate);
-  if (error) { syncState('error'); toast('Clear failed'); return; }
-  dayCache[currentDate] = [];
-  syncState('saved'); render(); fetchWeekTotal(); toast('Day cleared');
 }
 
 // ── Render ────────────────────────────────────────────────────────
@@ -933,8 +1004,8 @@ function render() {
   document.getElementById('todayBtn').style.display = currentDate === todayKey() ? 'none' : '';
   renderDayBar();
 
-  const entries = getDayEntries();
-  const list    = document.getElementById('entriesList');
+  const entries   = getDayEntries();
+  const list      = document.getElementById('entriesList');
   const totalMins = entries.reduce((s,e) => s + parseDuration(e.duration), 0);
 
   if (entries.length === 0) {
@@ -942,7 +1013,7 @@ function render() {
   } else {
     list.innerHTML = entries.map(e => {
       const mins     = parseDuration(e.duration);
-      const durLabel = mins > 0 ? formatMins(mins) : (e.duration || '');
+      const durLabel = mins > 0 ? formatMins(mins) : '';
       return `
         <div class="entry-row">
           <div class="entry-dot"></div>
@@ -963,112 +1034,137 @@ function render() {
     }).join('');
   }
 
-  // Update day total to include tracked entry time too
   if (totalMins > 0) {
     const cur = document.getElementById('dayTotal').textContent;
     if (!cur) document.getElementById('dayTotal').textContent = formatMins(totalMins)+' tracked';
   }
 }
 
-// ── Export ────────────────────────────────────────────────────────
-function buildSheet(rows) {
+// ── Excel exports ─────────────────────────────────────────────────
+function getEmployeeName() {
+  return document.getElementById('employeeName').value.trim() || 'Employee';
+}
+
+function timesheetHeader(year, employeeName) {
+  return [
+    ['North Star Historical Conservancy'],
+    ['Julia Morgan - Est 1905'],
+    [''],[''],[''],
+    ['Date','Time In','Time Out','Duration','',`Employee: ${employeeName} ${year}`],
+    ['']
+  ];
+}
+
+function makeWorkbook(rows, colWidths, sheetName) {
   const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [10,10,10,10,12,50].map(w => ({ wch: w }));
-  return ws;
-}
-
-function exportExcel() {
-  const entries = getDayEntries();
-  if (!entries.length) { toast('No entries to export.'); return; }
-  const meta = getDayMeta();
-  const rows = [['Date','Day Start','Day End','Duration','Category','Description'],
-    ...entries.map(e => [currentDate, meta.day_start||'', meta.day_end||'', e.duration||'', e.cat, e.text||''])];
+  ws['!cols'] = colWidths.map(w => ({ wch: w }));
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, buildSheet(rows), 'Timesheet');
-  XLSX.writeFile(wb, `timesheet_${currentDate}.xlsx`);
-  toast('Excel exported');
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  return wb;
 }
 
-async function exportAllExcel() {
+async function exportCompiled() {
+  const { start, end, label } = getPayPeriod(currentDate);
   syncState('saving');
   const [entriesRes, metaRes] = await Promise.all([
-    sb.from('timesheet_entries').select('*').order('entry_date').order('created_at'),
-    sb.from('timesheet_days').select('*')
+    sb.from('timesheet_entries').select('*').gte('entry_date', start).lte('entry_date', end).order('entry_date').order('created_at'),
+    sb.from('timesheet_days').select('*').gte('entry_date', start).lte('entry_date', end)
   ]);
   if (entriesRes.error) { syncState('error'); return; }
+
   const metaMap = {};
   for (const m of (metaRes.data||[])) metaMap[m.entry_date] = m;
-  const rows = [['Date','Day Start','Day End','Duration','Category','Description'],
-    ...(entriesRes.data||[]).map(r => {
-      const m = metaMap[r.entry_date]||{};
-      return [r.entry_date, m.day_start||'', m.day_end||'', r.duration||'', r.category, r.description||''];
-    })];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, buildSheet(rows), 'All Days');
-  XLSX.writeFile(wb, 'timesheet_all.xlsx');
-  syncState('saved'); toast('All days exported');
+
+  // Group entries by date
+  const byDate = {};
+  for (const r of (entriesRes.data||[])) {
+    if (!byDate[r.entry_date]) byDate[r.entry_date] = [];
+    byDate[r.entry_date].push(r);
+  }
+
+  const year = currentDate.split('-')[0];
+  const name = getEmployeeName();
+  const rows = timesheetHeader(year, name);
+
+  for (const date of Object.keys(byDate).sort()) {
+    const dayEntries = byDate[date];
+    const meta       = metaMap[date] || {};
+    const totalMins  = dayEntries.reduce((s,e) => s + parseDuration(e.duration||''), 0);
+    const desc       = dayEntries.map(e => e.description).filter(Boolean).join('; ');
+    const [y,m,d]    = date.split('-').map(Number);
+    const dateStr    = `${m}/${d}/${String(y).slice(2)}`;
+    rows.push([dateStr, formatTime12(meta.day_start), formatTime12(meta.day_end), totalMins > 0 ? parseFloat(minsToDecimal(totalMins)) : '', '', desc]);
+    rows.push(['']); // blank row between days like their template
+  }
+
+  XLSX.writeFile(makeWorkbook(rows, [10,10,10,10,4,70], `${label}`), `timesheet_compiled_${start}_${end}.xlsx`);
+  syncState('saved');
+  toast('Compiled exported');
+}
+
+async function exportDetailed() {
+  const { start, end, label } = getPayPeriod(currentDate);
+  syncState('saving');
+  const [entriesRes, metaRes] = await Promise.all([
+    sb.from('timesheet_entries').select('*').gte('entry_date', start).lte('entry_date', end).order('entry_date').order('created_at'),
+    sb.from('timesheet_days').select('*').gte('entry_date', start).lte('entry_date', end)
+  ]);
+  if (entriesRes.error) { syncState('error'); return; }
+
+  const metaMap = {};
+  for (const m of (metaRes.data||[])) metaMap[m.entry_date] = m;
+
+  const year = currentDate.split('-')[0];
+  const name = getEmployeeName();
+  const rows = [
+    ['North Star Historical Conservancy'],
+    ['Julia Morgan - Est 1905'],
+    [''],[''],[''],
+    ['Date','Time In','Time Out','Duration','Category',`Employee: ${name} ${year}`],
+    ['']
+  ];
+
+  for (const r of (entriesRes.data||[])) {
+    const meta    = metaMap[r.entry_date] || {};
+    const mins    = parseDuration(r.duration||'');
+    const [y,m,d] = r.entry_date.split('-').map(Number);
+    rows.push([
+      `${m}/${d}/${String(y).slice(2)}`,
+      formatTime12(meta.day_start),
+      formatTime12(meta.day_end),
+      mins > 0 ? parseFloat(minsToDecimal(mins)) : '',
+      r.category,
+      r.description||''
+    ]);
+  }
+
+  XLSX.writeFile(makeWorkbook(rows, [10,10,10,10,12,60], `${label} Detailed`), `timesheet_detailed_${start}_${end}.xlsx`);
+  syncState('saved');
+  toast('Detailed exported');
 }
 
 function exportCSV() {
   const entries = getDayEntries();
   if (!entries.length) { toast('No entries to export.'); return; }
   const meta = getDayMeta();
-  const rows = [['Date','Day Start','Day End','Duration','Category','Description']];
-  for (const e of entries)
-    rows.push([currentDate, meta.day_start||'', meta.day_end||'', e.duration||'', e.cat, '"'+(e.text||'').replace(/"/g,'""')+'"']);
-  dl(rows.map(r=>r.join(',')).join('\n'), `timesheet_${currentDate}.csv`, 'text/csv');
+  const rows = [['Date','Time In','Time Out','Duration','Category','Description']];
+  for (const e of entries) {
+    const mins = parseDuration(e.duration);
+    rows.push([currentDate, formatTime12(meta.day_start), formatTime12(meta.day_end),
+      mins > 0 ? minsToDecimal(mins) : '', e.cat, '"'+(e.text||'').replace(/"/g,'""')+'"']);
+  }
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'})),
+    download: `timesheet_${currentDate}.csv`
+  });
+  a.click(); URL.revokeObjectURL(a.href);
   toast('CSV exported');
 }
 
-function exportText() {
-  const entries = getDayEntries();
-  if (!entries.length) { toast('No entries to export.'); return; }
-  const meta = getDayMeta();
-  let out = `TIMESHEET — ${formatDateLabel(currentDate)}\n${'='.repeat(52)}\n`;
-  if (meta.day_start||meta.day_end) out += `Hours: ${meta.day_start||'?'} – ${meta.day_end||'?'}\n`;
-  out += '\n';
-  for (const e of entries) {
-    const mins = parseDuration(e.duration);
-    out += `[${mins>0?formatMins(mins):e.duration||'–'}] ${e.cat.toUpperCase()}\n  ${e.text}\n\n`;
-  }
-  const total = entries.reduce((s,e)=>s+parseDuration(e.duration),0);
-  if (total > 0) out += `${'─'.repeat(52)}\nTotal tracked: ${formatMins(total)}\n`;
-  dl(out, `timesheet_${currentDate}.txt`, 'text/plain');
-  toast('Text exported');
-}
-
-async function exportAllCSV() {
-  syncState('saving');
-  const [entriesRes, metaRes] = await Promise.all([
-    sb.from('timesheet_entries').select('*').order('entry_date').order('created_at'),
-    sb.from('timesheet_days').select('*')
-  ]);
-  if (entriesRes.error) { syncState('error'); return; }
-  const metaMap = {};
-  for (const m of (metaRes.data||[])) metaMap[m.entry_date] = m;
-  const rows = [['Date','Day Start','Day End','Duration','Category','Description']];
-  for (const r of (entriesRes.data||[])) {
-    const m = metaMap[r.entry_date]||{};
-    rows.push([r.entry_date, m.day_start||'', m.day_end||'', r.duration||'', r.category, '"'+(r.description||'').replace(/"/g,'""')+'"']);
-  }
-  dl(rows.map(r=>r.join(',')).join('\n'), 'timesheet_all.csv', 'text/csv');
-  syncState('saved'); toast('All days exported');
-}
-
-function dl(content, filename, type) {
-  const a = Object.assign(document.createElement('a'), {
-    href: URL.createObjectURL(new Blob([content],{type})), download: filename
-  });
-  a.click(); URL.revokeObjectURL(a.href);
-}
-
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>el.classList.remove('show'), 2200);
-}
+// ── Employee name persistence ─────────────────────────────────────
+const nameInput = document.getElementById('employeeName');
+nameInput.value = localStorage.getItem('ts_employee') || '';
+nameInput.addEventListener('input', () => localStorage.setItem('ts_employee', nameInput.value));
 
 // ── Init ──────────────────────────────────────────────────────────
 const hourOpts = buildHourOptions();
@@ -1085,7 +1181,7 @@ document.getElementById('editModal').addEventListener('click', e => {
 
 (async () => {
   await fetchDay(currentDate);
-  fetchWeekTotal();
+  fetchPeriodTotal();
   render();
 })();
 </script>
