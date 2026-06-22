@@ -1055,11 +1055,16 @@ function timesheetHeader(year, employeeName) {
   ];
 }
 
+function safeSheet(name) {
+  // Excel sheet names: max 31 chars, no / \ ? * [ ]
+  return name.replace(/[\/\\?\*\[\]]/g, '-').slice(0, 31);
+}
+
 function makeWorkbook(rows, colWidths, sheetName) {
   const ws = XLSX.utils.aoa_to_sheet(rows);
   ws['!cols'] = colWidths.map(w => ({ wch: w }));
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  XLSX.utils.book_append_sheet(wb, ws, safeSheet(sheetName));
   return wb;
 }
 
@@ -1097,9 +1102,11 @@ async function exportCompiled() {
     rows.push(['']); // blank row between days like their template
   }
 
-  XLSX.writeFile(makeWorkbook(rows, [10,10,10,10,4,70], `${label}`), `timesheet_compiled_${start}_${end}.xlsx`);
-  syncState('saved');
-  toast('Compiled exported');
+  try {
+    XLSX.writeFile(makeWorkbook(rows, [10,10,10,10,4,70], `Compiled`), `timesheet_compiled_${start}_${end}.xlsx`);
+    syncState('saved');
+    toast('Compiled exported');
+  } catch(e) { syncState('error'); toast('Export failed: ' + e.message); }
 }
 
 async function exportDetailed() {
@@ -1138,9 +1145,11 @@ async function exportDetailed() {
     ]);
   }
 
-  XLSX.writeFile(makeWorkbook(rows, [10,10,10,10,12,60], `${label} Detailed`), `timesheet_detailed_${start}_${end}.xlsx`);
-  syncState('saved');
-  toast('Detailed exported');
+  try {
+    XLSX.writeFile(makeWorkbook(rows, [10,10,10,10,12,60], `Detailed`), `timesheet_detailed_${start}_${end}.xlsx`);
+    syncState('saved');
+    toast('Detailed exported');
+  } catch(e) { syncState('error'); toast('Export failed: ' + e.message); }
 }
 
 function exportCSV() {
