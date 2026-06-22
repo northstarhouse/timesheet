@@ -221,20 +221,34 @@ select.cat-pill {
 
 .day-hours-row label { font-size: 11px; color: var(--text-3); }
 
-input[type="time"] {
+.time-pick {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.time-pick select {
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--border);
   color: var(--text-2);
   font-size: 12px;
-  width: 82px;
   outline: none;
   font-family: inherit;
-  padding: 2px 0;
-  transition: border-color 0.12s;
+  padding: 2px 2px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.12s, color 0.12s;
 }
 
-input[type="time"]:focus { border-color: var(--gold); color: var(--text); }
+.time-pick select:focus { border-color: var(--gold); color: var(--text); }
+
+#dayStartH, #dayEndH { width: 28px; text-align: center; }
+#dayStartM, #dayEndM { width: 24px; text-align: center; }
+#dayStartA, #dayEndA { width: 30px; text-align: center; }
+
+.time-colon { font-size: 12px; color: var(--text-3); line-height: 1; padding-bottom: 1px; }
 
 .day-sep { color: var(--text-3); font-size: 11px; }
 
@@ -553,10 +567,36 @@ input[type="time"]:focus { border-color: var(--gold); color: var(--text); }
       <span class="day-name" id="dayName"></span>
       <div class="day-hours-row">
         <label>In</label>
-        <input type="time" id="dayStart" step="900" onchange="saveDayHours()">
+        <div class="time-pick">
+          <select id="dayStartH" onchange="saveDayHours()"></select>
+          <span class="time-colon">:</span>
+          <select id="dayStartM" onchange="saveDayHours()">
+            <option value="00">00</option>
+            <option value="15">15</option>
+            <option value="30">30</option>
+            <option value="45">45</option>
+          </select>
+          <select id="dayStartA" onchange="saveDayHours()">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
+        </div>
         <span class="day-sep">›</span>
         <label>Out</label>
-        <input type="time" id="dayEnd" step="900" onchange="saveDayHours()">
+        <div class="time-pick">
+          <select id="dayEndH" onchange="saveDayHours()"></select>
+          <span class="time-colon">:</span>
+          <select id="dayEndM" onchange="saveDayHours()">
+            <option value="00">00</option>
+            <option value="15">15</option>
+            <option value="30">30</option>
+            <option value="45">45</option>
+          </select>
+          <select id="dayEndA" onchange="saveDayHours()">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
+        </div>
       </div>
       <span class="day-total" id="dayTotal"></span>
     </div>
@@ -688,10 +728,41 @@ async function fetchWeekTotal() {
 function getDayEntries() { return dayCache[currentDate] || []; }
 function getDayMeta()    { return dayMeta[currentDate]  || {}; }
 
+// ── Custom time picker helpers ────────────────────────────────────
+function buildHourOptions() {
+  return Array.from({length:12}, (_,i) => {
+    const v = String(i+1);
+    return `<option value="${v}">${v}</option>`;
+  }).join('');
+}
+
+// "HH:MM" 24h → picker fields
+function setTimePicker(prefix, val24) {
+  if (!val24) return;
+  const [h24,m] = val24.split(':').map(Number);
+  const ampm = h24 >= 12 ? 'PM' : 'AM';
+  let h12 = h24 % 12; if (h12 === 0) h12 = 12;
+  const mSnap = [0,15,30,45].reduce((a,b) => Math.abs(b-m) < Math.abs(a-m) ? b : a);
+  document.getElementById(prefix+'H').value = String(h12);
+  document.getElementById(prefix+'M').value = String(mSnap).padStart(2,'0');
+  document.getElementById(prefix+'A').value = ampm;
+}
+
+// picker fields → "HH:MM" 24h
+function getTimePicker(prefix) {
+  const h12 = parseInt(document.getElementById(prefix+'H').value);
+  const m   = document.getElementById(prefix+'M').value;
+  const a   = document.getElementById(prefix+'A').value;
+  if (!h12) return null;
+  let h24 = h12 % 12;
+  if (a === 'PM') h24 += 12;
+  return `${pad(h24)}:${m}`;
+}
+
 // ── Day hours ─────────────────────────────────────────────────────
 async function saveDayHours() {
-  const start = document.getElementById('dayStart').value || null;
-  const end   = document.getElementById('dayEnd').value   || null;
+  const start = getTimePicker('dayStart');
+  const end   = getTimePicker('dayEnd');
   dayMeta[currentDate] = { day_start: start, day_end: end };
   renderDayBar();
   syncState('saving');
@@ -704,8 +775,8 @@ async function saveDayHours() {
 
 function renderDayBar() {
   const meta = getDayMeta();
-  document.getElementById('dayStart').value = meta.day_start || '';
-  document.getElementById('dayEnd').value   = meta.day_end   || '';
+  setTimePicker('dayStart', meta.day_start);
+  setTimePicker('dayEnd',   meta.day_end);
   if (meta.day_start && meta.day_end) {
     const [sh,sm] = meta.day_start.split(':').map(Number);
     const [eh,em] = meta.day_end.split(':').map(Number);
@@ -927,6 +998,10 @@ function toast(msg) {
 }
 
 // ── Init ──────────────────────────────────────────────────────────
+const hourOpts = buildHourOptions();
+document.getElementById('dayStartH').innerHTML = hourOpts;
+document.getElementById('dayEndH').innerHTML   = hourOpts;
+
 document.getElementById('taskInput').addEventListener('keydown', e => {
   if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); addEntry(); }
 });
