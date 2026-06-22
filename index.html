@@ -1049,7 +1049,7 @@ function timesheetHeader(year, employeeName) {
     ['North Star Historical Conservancy'],
     ['Julia Morgan - Est 1905'],
     [''],[''],[''],
-    ['Date','Time In','Time Out','Duration','',`Employee: ${employeeName} ${year}`],
+    [toBold('Date'),toBold('Time In'),toBold('Time Out'),toBold('Duration'),'',`Employee: ${employeeName} ${year}`],
     ['']
   ];
 }
@@ -1057,6 +1057,16 @@ function timesheetHeader(year, employeeName) {
 function safeSheet(name) {
   // Excel sheet names: max 31 chars, no / \ ? * [ ]
   return name.replace(/[\/\\?\*\[\]]/g, '-').slice(0, 31);
+}
+
+function toBold(str) {
+  return str.split('').map(c => {
+    const code = c.codePointAt(0);
+    if (code >= 65 && code <= 90)  return String.fromCodePoint(code - 65 + 0x1D400);
+    if (code >= 97 && code <= 122) return String.fromCodePoint(code - 97 + 0x1D41A);
+    if (code >= 48 && code <= 57)  return String.fromCodePoint(code - 48 + 0x1D7CE);
+    return c;
+  }).join('');
 }
 
 function toCursive(str) {
@@ -1168,7 +1178,7 @@ async function exportDetailed() {
     ['North Star Historical Conservancy'],
     ['Julia Morgan - Est 1905'],
     [''],[''],[''],
-    ['Date','Duration','Category',`Employee: ${name} ${year}`],
+    [toBold('Date'),toBold('Duration'),toBold('Category'),`Employee: ${name} ${year}`],
     ['']
   ];
 
