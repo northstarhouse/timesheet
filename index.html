@@ -312,7 +312,8 @@ select.cat-pill {
 .cat-design  { background: #f0ecf8; color: #6b44a0; }
 .cat-dev     { background: #eaf0f8; color: #2a5a9a; }
 .cat-review  { background: #fdf3e8; color: #a05a1a; }
-.cat-admin   { background: #fceaea; color: #a02828; }
+.cat-admin      { background: #fceaea; color: #a02828; }
+.cat-marketing  { background: #e8f4fd; color: #1a6a9a; }
 
 .entry-right {
   display: flex;
@@ -575,6 +576,7 @@ select.cat-pill {
           <option value="design">Design</option>
           <option value="review">Review</option>
           <option value="admin">Admin</option>
+          <option value="marketing">Marketing</option>
         </select>
       </div>
       <button class="add-btn" onclick="addEntry()" title="Add entry">+</button>
@@ -921,7 +923,7 @@ async function clearDay() {
 }
 
 // ── Render ────────────────────────────────────────────────────────
-const CAT_CLASS = { general:'cat-general', meeting:'cat-meeting', design:'cat-design', dev:'cat-dev', review:'cat-review', admin:'cat-admin' };
+const CAT_CLASS = { general:'cat-general', meeting:'cat-meeting', design:'cat-design', dev:'cat-dev', review:'cat-review', admin:'cat-admin', marketing:'cat-marketing' };
 
 function escHtml(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
