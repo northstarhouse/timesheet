@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Timesheet — The North Star House</title>
-<link href="https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -25,7 +26,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -49,7 +50,7 @@ body {
 .app-header img { height: 32px; width: auto; filter: brightness(0) invert(1); opacity: 0.92; }
 
 .app-header h1 {
-  font-family: 'Cardo', serif;
+  font-family: 'Inter', sans-serif;
   font-size: 18px;
   font-weight: 700;
   color: #f8f4ec;
@@ -468,7 +469,7 @@ select.cat-pill {
 }
 
 .modal h2 {
-  font-family: 'Cardo', serif;
+  font-family: 'Inter', sans-serif;
   font-size: 17px; font-weight: 700;
   color: var(--text); margin-bottom: 14px;
 }
@@ -642,9 +643,10 @@ select.cat-pill {
 
   <!-- Export -->
   <div class="export-bar">
-    <button class="exp-btn primary" onclick="exportCSV()">&#8595; CSV</button>
+    <button class="exp-btn primary" onclick="exportExcel()">&#8595; Excel</button>
+    <button class="exp-btn" onclick="exportCSV()">&#8595; CSV</button>
     <button class="exp-btn" onclick="exportText()">Text</button>
-    <button class="exp-btn" onclick="exportAllCSV()">&#8595; All Days</button>
+    <button class="exp-btn" onclick="exportAllExcel()">&#8595; All Days</button>
   </div>
 
 </div>
@@ -972,6 +974,44 @@ function render() {
 }
 
 // ── Export ────────────────────────────────────────────────────────
+function buildSheet(rows) {
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [10,10,10,10,12,50].map(w => ({ wch: w }));
+  return ws;
+}
+
+function exportExcel() {
+  const entries = getDayEntries();
+  if (!entries.length) { toast('No entries to export.'); return; }
+  const meta = getDayMeta();
+  const rows = [['Date','Day Start','Day End','Duration','Category','Description'],
+    ...entries.map(e => [currentDate, meta.day_start||'', meta.day_end||'', e.duration||'', e.cat, e.text||''])];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, buildSheet(rows), 'Timesheet');
+  XLSX.writeFile(wb, `timesheet_${currentDate}.xlsx`);
+  toast('Excel exported');
+}
+
+async function exportAllExcel() {
+  syncState('saving');
+  const [entriesRes, metaRes] = await Promise.all([
+    sb.from('timesheet_entries').select('*').order('entry_date').order('created_at'),
+    sb.from('timesheet_days').select('*')
+  ]);
+  if (entriesRes.error) { syncState('error'); return; }
+  const metaMap = {};
+  for (const m of (metaRes.data||[])) metaMap[m.entry_date] = m;
+  const rows = [['Date','Day Start','Day End','Duration','Category','Description'],
+    ...(entriesRes.data||[]).map(r => {
+      const m = metaMap[r.entry_date]||{};
+      return [r.entry_date, m.day_start||'', m.day_end||'', r.duration||'', r.category, r.description||''];
+    })];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, buildSheet(rows), 'All Days');
+  XLSX.writeFile(wb, 'timesheet_all.xlsx');
+  syncState('saved'); toast('All days exported');
+}
+
 function exportCSV() {
   const entries = getDayEntries();
   if (!entries.length) { toast('No entries to export.'); return; }
