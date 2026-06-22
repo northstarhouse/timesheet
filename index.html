@@ -70,7 +70,7 @@ body {
 .sync-dot.error   { background: var(--red); }
 
 /* ── Body ── */
-.body { max-width: 600px; margin: 0 auto; padding: 0 0 64px; }
+.body { max-width: 600px; margin: 0; padding: 0 0 64px; }
 
 /* ── Add entry card ── */
 .add-card {
@@ -373,8 +373,11 @@ select.cat-pill {
   gap: 8px;
   align-items: center;
   max-width: 600px;
-  margin: 0 auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.export-bar::-webkit-scrollbar { display: none; }
 
 .exp-btn {
   background: var(--bg);
@@ -400,7 +403,7 @@ select.cat-pill {
 .date-nav {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 12px;
   padding: 10px 18px;
   background: var(--surface);
@@ -497,6 +500,38 @@ select.cat-pill {
 .modal-footer .save-btn:hover { background: var(--header-dk); }
 .modal-footer button:hover { border-color: var(--gold); color: var(--gold); }
 .modal-footer .save-btn:hover { color: #fff; }
+
+/* ── Mobile ── */
+@media (max-width: 540px) {
+  .body { padding-bottom: 76px; }
+
+  .add-card { padding: 12px 14px; }
+  textarea.what-input { font-size: 16px; } /* prevent iOS zoom */
+  .add-row { flex-wrap: wrap; gap: 8px; }
+  .add-row-left { flex-wrap: wrap; }
+  .add-btn { width: 44px; height: 44px; font-size: 22px; margin-left: auto; }
+
+  /* Day header: stack into two rows */
+  .day-header { flex-wrap: wrap; gap: 6px; padding: 10px 14px; }
+  .day-name { width: 100%; flex: none; }
+  .day-hours-row { flex-wrap: wrap; gap: 6px; }
+  .day-total { margin-left: 0; }
+
+  /* Bigger touch targets on time selects */
+  .time-pick select { font-size: 14px; padding: 4px 2px; }
+  #dayStartH, #dayEndH { width: 32px; }
+  #dayStartM, #dayEndM { width: 28px; }
+  #dayStartA, #dayEndA { width: 36px; }
+
+  /* Entry actions always visible on touch */
+  .entry-actions { opacity: 1; }
+  .entry-actions button { padding: 6px 8px; font-size: 14px; }
+
+  .entry-row { padding: 12px 14px; }
+  .week-total, .date-nav { padding: 10px 14px; }
+  .export-bar { padding: 10px 14px; }
+  .exp-btn { padding: 8px 12px; font-size: 12px; flex-shrink: 0; }
+}
 
 /* ── Toast ── */
 .toast {
