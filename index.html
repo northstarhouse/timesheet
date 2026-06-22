@@ -1059,6 +1059,16 @@ function safeSheet(name) {
   return name.replace(/[\/\\?\*\[\]]/g, '-').slice(0, 31);
 }
 
+function detailedFooter(totalMins, employeeName) {
+  const dec = parseFloat(minsToDecimal(totalMins));
+  return [
+    [''],
+    ['TOTAL:', dec, '', ''],
+    [''],
+    [`Employee Signature: ${employeeName}`, '', '', ''],
+  ];
+}
+
 function timesheetFooter(totalMins, employeeName) {
   const dec = parseFloat(minsToDecimal(totalMins));
   return [
@@ -1163,7 +1173,7 @@ async function exportDetailed() {
     ]);
   }
 
-  rows.push(...timesheetFooter(grandTotal, name));
+  rows.push(...detailedFooter(grandTotal, name));
 
   try {
     XLSX.writeFile(makeWorkbook(rows, [10,10,12,60], `Detailed`), `timesheet_detailed_${start}_${end}.xlsx`);
