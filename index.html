@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Timesheet</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0f0f13;
+    color: #e8e8e8;
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+
+  .container { max-width: 720px; margin: 0 auto; }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .subtitle { font-size: 13px; color: #666; margin-bottom: 28px; }
+
+  /* Date nav */
+  .date-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .date-nav button {
+    background: #1e1e26;
+    border: 1px solid #2a2a36;
+    color: #aaa;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .date-nav button:hover { background: #2a2a36; color: #fff; }
+
+  .current-date {
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    flex: 1;
+  }
+
+  .today-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: #3b5bff22;
+    color: #6b8aff;
+    border: 1px solid #3b5bff44;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* Input card */
+  .input-card {
+    background: #1a1a22;
+    border: 1px solid #2a2a36;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .time-inputs {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .time-inputs span { color: #555; font-size: 13px; }
+
+  input[type="time"] {
+    background: #0f0f13;
+    border: 1px solid #2a2a36;
+    color: #e8e8e8;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    width: 110px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type="time"]:focus { border-color: #4a6bff; }
+
+  .task-input {
+    flex: 1;
+    background: #0f0f13;
+    border: 1px solid #2a2a36;
+    color: #e8e8e8;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    resize: none;
+    min-height: 44px;
+    max-height: 120px;
+    font-family: inherit;
+  }
+
+  .task-input:focus { border-color: #4a6bff; }
+  .task-input::placeholder { color: #444; }
+
+  .input-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .category-select {
+    background: #0f0f13;
+    border: 1px solid #2a2a36;
+    color: #aaa;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .add-btn {
+    background: #3b5bff;
+    color: #fff;
+    border: none;
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .add-btn:hover { background: #4a6bff; }
+  .add-btn:active { background: #2a4bee; }
+
+  /* Entries */
+  .entries-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .entries-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .total-time {
+    font-size: 13px;
+    color: #6b8aff;
+    font-weight: 600;
+  }
+
+  .entries-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .entry {
+    background: #1a1a22;
+    border: 1px solid #2a2a36;
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: border-color 0.15s;
+  }
+
+  .entry:hover { border-color: #3a3a4a; }
+
+  .entry-time {
+    font-size: 12px;
+    color: #555;
+    white-space: nowrap;
+    padding-top: 2px;
+    min-width: 90px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .entry-duration {
+    font-size: 12px;
+    color: #6b8aff;
+    white-space: nowrap;
+    padding-top: 2px;
+    min-width: 50px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .entry-body { flex: 1; }
+
+  .entry-text {
+    font-size: 14px;
+    color: #e8e8e8;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .entry-category {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+
+  .cat-general   { background: #2a2a36; color: #888; }
+  .cat-meeting   { background: #1e3a2a; color: #4caf80; }
+  .cat-design    { background: #2a1e3a; color: #a06bff; }
+  .cat-dev       { background: #1e2a3a; color: #4a8aff; }
+  .cat-review    { background: #3a2a1e; color: #ff9a4a; }
+  .cat-admin     { background: #3a1e1e; color: #ff6b6b; }
+
+  .entry-actions {
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .entry:hover .entry-actions { opacity: 1; }
+
+  .entry-actions button {
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: color 0.15s;
+  }
+
+  .entry-actions button:hover { color: #ff6b6b; }
+
+  .edit-btn:hover { color: #6b8aff !important; }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: #444;
+  }
+
+  .empty-icon { font-size: 36px; margin-bottom: 12px; }
+  .empty p { font-size: 14px; }
+
+  /* Export bar */
+  .export-bar {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #1e1e26;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .export-btn {
+    background: #1a1a22;
+    border: 1px solid #2a2a36;
+    color: #aaa;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .export-btn:hover { background: #2a2a36; color: #fff; border-color: #3a3a4a; }
+
+  .export-btn.primary {
+    background: #1e2a1e;
+    border-color: #2a4a2a;
+    color: #4caf80;
+  }
+
+  .export-btn.primary:hover { background: #2a3a2a; color: #6dcf9a; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #1e2a1e;
+    border: 1px solid #2a4a2a;
+    color: #4caf80;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.2s;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Edit modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: #1a1a22;
+    border: 1px solid #2a2a36;
+    border-radius: 14px;
+    padding: 24px;
+    width: 100%;
+    max-width: 480px;
+    margin: 16px;
+  }
+
+  .modal h2 { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 16px; }
+
+  .modal textarea {
+    width: 100%;
+    background: #0f0f13;
+    border: 1px solid #2a2a36;
+    color: #e8e8e8;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+    margin-bottom: 12px;
+  }
+
+  .modal textarea:focus { border-color: #4a6bff; }
+
+  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; }
+
+  .modal-footer button {
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid #2a2a36;
+    background: #1a1a22;
+    color: #aaa;
+    transition: all 0.15s;
+  }
+
+  .modal-footer .save-btn {
+    background: #3b5bff;
+    border-color: #3b5bff;
+    color: #fff;
+  }
+
+  .modal-footer button:hover { background: #2a2a36; color: #fff; }
+  .modal-footer .save-btn:hover { background: #4a6bff; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Timesheet</h1>
+  <p class="subtitle">Log what you did — export when you're done.</p>
+
+  <!-- Date navigation -->
+  <div class="date-nav">
+    <button onclick="changeDay(-1)" title="Previous day">&#8249;</button>
+    <div class="current-date" id="currentDateLabel"></div>
+    <span id="todayBadge" class="today-badge">Today</span>
+    <button onclick="changeDay(1)" title="Next day">&#8250;</button>
+  </div>
+
+  <!-- Input card -->
+  <div class="input-card">
+    <div class="time-inputs" style="margin-bottom:12px;">
+      <label style="font-size:12px;color:#555;margin-right:4px;">From</label>
+      <input type="time" id="startTime">
+      <span>to</span>
+      <input type="time" id="endTime">
+    </div>
+    <div class="input-row">
+      <textarea class="task-input" id="taskInput" placeholder="What did you work on?" rows="2"></textarea>
+    </div>
+    <div class="input-footer">
+      <select class="category-select" id="categorySelect">
+        <option value="general">General</option>
+        <option value="meeting">Meeting</option>
+        <option value="dev">Development</option>
+        <option value="design">Design</option>
+        <option value="review">Review</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button class="add-btn" onclick="addEntry()">+ Add Entry</button>
+    </div>
+  </div>
+
+  <!-- Entries -->
+  <div class="entries-header">
+    <span class="entries-title">Entries</span>
+    <span class="total-time" id="totalTime"></span>
+  </div>
+  <div class="entries-list" id="entriesList"></div>
+
+  <!-- Export -->
+  <div class="export-bar">
+    <button class="export-btn primary" onclick="exportCSV()">&#8595; Export CSV</button>
+    <button class="export-btn" onclick="exportText()">&#8195; Export Text</button>
+    <button class="export-btn" onclick="exportAllCSV()">&#8595; Export All Days (CSV)</button>
+    <button class="export-btn" onclick="clearDay()" style="margin-left:auto;color:#ff6b6b;">Clear Day</button>
+  </div>
+  <div id="syncStatus" style="margin-top:10px;font-size:12px;color:#444;text-align:right;"></div>
+</div>
+
+<!-- Edit modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h2>Edit Entry</h2>
+    <div class="time-inputs" style="margin-bottom:12px;">
+      <label style="font-size:12px;color:#555;margin-right:4px;">From</label>
+      <input type="time" id="editStart">
+      <span>to</span>
+      <input type="time" id="editEnd">
+    </div>
+    <textarea id="editText"></textarea>
+    <select class="category-select" id="editCategory" style="margin-bottom:14px;width:100%;display:block;"></select>
+    <div class="modal-footer">
+      <button onclick="closeModal()">Cancel</button>
+      <button class="save-btn" onclick="saveEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Supabase setup ──────────────────────────────────────────────
+const SUPABASE_URL = 'https://uvzwhhwzelaelfhfkvdb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_EbFMfEbyEp3gASl-GZm3tQ_LnPEe5do';
+const TABLE = 'timesheet_entries';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── State ───────────────────────────────────────────────────────
+let currentDate = todayKey();
+let editingId = null;
+let dayCache = {}; // { [date]: entry[] }
+
+// ── Helpers ─────────────────────────────────────────────────────
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function formatDateLabel(key) {
+  const [y,m,d] = key.split('-').map(Number);
+  return new Date(y, m-1, d).toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+function nowTime() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function syncStatus(msg) {
+  document.getElementById('syncStatus').textContent = msg;
+}
+
+// ── Data layer (Supabase) ────────────────────────────────────────
+function rowToEntry(row) {
+  return { id: row.id, text: row.description, start: row.start_time, end: row.end_time, cat: row.category };
+}
+
+async function fetchDay(date) {
+  syncStatus('Loading…');
+  const { data, error } = await sb.from(TABLE)
+    .select('*')
+    .eq('entry_date', date)
+    .order('created_at', { ascending: true });
+
+  if (error) { syncStatus('Error loading: ' + error.message); return []; }
+  dayCache[date] = (data || []).map(rowToEntry);
+  syncStatus('');
+  return dayCache[date];
+}
+
+function getDayEntries() {
+  return dayCache[currentDate] || [];
+}
+
+// ── Day navigation ───────────────────────────────────────────────
+async function changeDay(delta) {
+  const [y,m,d] = currentDate.split('-').map(Number);
+  const date = new Date(y, m-1, d + delta);
+  currentDate = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+  if (!dayCache[currentDate]) await fetchDay(currentDate);
+  render();
+}
+
+// ── Add entry ────────────────────────────────────────────────────
+async function addEntry() {
+  const text = document.getElementById('taskInput').value.trim();
+  if (!text) { toast('Type what you did first.'); return; }
+
+  const start = document.getElementById('startTime').value || null;
+  const end   = document.getElementById('endTime').value   || null;
+  const cat   = document.getElementById('categorySelect').value;
+
+  syncStatus('Saving…');
+  const { data, error } = await sb.from(TABLE).insert({
+    entry_date:  currentDate,
+    start_time:  start,
+    end_time:    end,
+    description: text,
+    category:    cat
+  }).select().single();
+
+  if (error) { syncStatus('Save failed: ' + error.message); toast('Save failed'); return; }
+
+  if (!dayCache[currentDate]) dayCache[currentDate] = [];
+  dayCache[currentDate].push(rowToEntry(data));
+
+  document.getElementById('taskInput').value = '';
+  if (end) {
+    document.getElementById('startTime').value = end;
+    document.getElementById('endTime').value = '';
+  }
+
+  syncStatus('Saved');
+  render();
+  toast('Entry saved');
+  setTimeout(() => syncStatus(''), 1500);
+}
+
+// ── Delete entry ─────────────────────────────────────────────────
+async function deleteEntry(id) {
+  syncStatus('Deleting…');
+  const { error } = await sb.from(TABLE).delete().eq('id', id);
+  if (error) { syncStatus('Delete failed: ' + error.message); return; }
+
+  dayCache[currentDate] = (dayCache[currentDate] || []).filter(e => e.id !== id);
+  syncStatus('');
+  render();
+}
+
+// ── Edit modal ───────────────────────────────────────────────────
+function openEdit(id) {
+  const entry = getDayEntries().find(e => e.id === id);
+  if (!entry) return;
+  editingId = id;
+
+  document.getElementById('editText').value  = entry.text;
+  document.getElementById('editStart').value = entry.start || '';
+  document.getElementById('editEnd').value   = entry.end   || '';
+
+  const sel = document.getElementById('editCategory');
+  sel.innerHTML = document.getElementById('categorySelect').innerHTML;
+  sel.value = entry.cat;
+
+  document.getElementById('editModal').classList.add('show');
+  setTimeout(() => document.getElementById('editText').focus(), 50);
+}
+
+async function saveEdit() {
+  const text = document.getElementById('editText').value.trim();
+  if (!text) return;
+
+  const updates = {
+    description: text,
+    start_time:  document.getElementById('editStart').value || null,
+    end_time:    document.getElementById('editEnd').value   || null,
+    category:    document.getElementById('editCategory').value
+  };
+
+  syncStatus('Updating…');
+  const { error } = await sb.from(TABLE).update(updates).eq('id', editingId);
+  if (error) { syncStatus('Update failed: ' + error.message); return; }
+
+  dayCache[currentDate] = (dayCache[currentDate] || []).map(e => {
+    if (e.id !== editingId) return e;
+    return { ...e, text: updates.description, start: updates.start_time, end: updates.end_time, cat: updates.category };
+  });
+
+  closeModal();
+  syncStatus('');
+  render();
+  toast('Entry updated');
+}
+
+function closeModal() {
+  document.getElementById('editModal').classList.remove('show');
+  editingId = null;
+}
+
+// ── Clear day ────────────────────────────────────────────────────
+async function clearDay() {
+  const entries = getDayEntries();
+  if (!entries.length) { toast('Nothing to clear.'); return; }
+  if (!confirm(`Delete all ${entries.length} entr${entries.length===1?'y':'ies'} for ${currentDate}?`)) return;
+
+  syncStatus('Clearing…');
+  const { error } = await sb.from(TABLE).delete().eq('entry_date', currentDate);
+  if (error) { syncStatus('Clear failed: ' + error.message); return; }
+
+  dayCache[currentDate] = [];
+  syncStatus('');
+  render();
+  toast('Day cleared');
+}
+
+// ── Duration helpers ─────────────────────────────────────────────
+function calcDuration(start, end) {
+  if (!start || !end) return null;
+  const [sh,sm] = start.split(':').map(Number);
+  const [eh,em] = end.split(':').map(Number);
+  const mins = (eh*60+em) - (sh*60+sm);
+  if (mins <= 0) return null;
+  const h = Math.floor(mins/60), m = mins%60;
+  return h > 0 ? `${h}h${m > 0 ? m+'m':''}` : `${m}m`;
+}
+
+function calcTotalMins(entries) {
+  let total = 0;
+  for (const e of entries) {
+    if (!e.start || !e.end) continue;
+    const [sh,sm] = e.start.split(':').map(Number);
+    const [eh,em] = e.end.split(':').map(Number);
+    const d = (eh*60+em)-(sh*60+sm);
+    if (d > 0) total += d;
+  }
+  return total;
+}
+
+function catClass(cat) {
+  return ({ general:'cat-general', meeting:'cat-meeting', design:'cat-design', dev:'cat-dev', review:'cat-review', admin:'cat-admin' })[cat] || 'cat-general';
+}
+
+// ── Render ───────────────────────────────────────────────────────
+function render() {
+  document.getElementById('currentDateLabel').textContent = formatDateLabel(currentDate);
+  document.getElementById('todayBadge').style.display = currentDate === todayKey() ? '' : 'none';
+
+  const entries = getDayEntries();
+  const list = document.getElementById('entriesList');
+
+  if (entries.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">&#9998;</div><p>No entries yet. Add your first task above.</p></div>`;
+    document.getElementById('totalTime').textContent = '';
+    return;
+  }
+
+  const totalMins = calcTotalMins(entries);
+  if (totalMins > 0) {
+    const th = Math.floor(totalMins/60), tm = totalMins%60;
+    document.getElementById('totalTime').textContent = `Total: ${th > 0 ? th+'h ' : ''}${tm > 0 ? tm+'m' : ''}`;
+  } else {
+    document.getElementById('totalTime').textContent = `${entries.length} entr${entries.length===1?'y':'ies'}`;
+  }
+
+  list.innerHTML = entries.map(e => {
+    const timeStr = e.start ? `${e.start}${e.end ? ' – '+e.end : ''}` : '';
+    const dur = calcDuration(e.start, e.end);
+    return `
+      <div class="entry">
+        <div class="entry-time">${timeStr}</div>
+        ${dur ? `<div class="entry-duration">${dur}</div>` : ''}
+        <div class="entry-body">
+          <div class="entry-text">${escHtml(e.text)}</div>
+          <span class="entry-category ${catClass(e.cat)}">${e.cat}</span>
+        </div>
+        <div class="entry-actions">
+          <button class="edit-btn" onclick="openEdit(${e.id})" title="Edit">&#9998;</button>
+          <button onclick="deleteEntry(${e.id})" title="Delete">&#10005;</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// ── Export ───────────────────────────────────────────────────────
+function exportCSV() {
+  const entries = getDayEntries();
+  if (!entries.length) { toast('No entries to export.'); return; }
+  const rows = [['Date','Start','End','Duration','Category','Description']];
+  for (const e of entries) {
+    rows.push([currentDate, e.start||'', e.end||'', calcDuration(e.start,e.end)||'', e.cat, '"'+(e.text||'').replace(/"/g,'""')+'"']);
+  }
+  downloadText(rows.map(r=>r.join(',')).join('\n'), `timesheet_${currentDate}.csv`, 'text/csv');
+  toast('CSV exported');
+}
+
+function exportText() {
+  const entries = getDayEntries();
+  if (!entries.length) { toast('No entries to export.'); return; }
+  let out = `TIMESHEET — ${formatDateLabel(currentDate)}\n${'='.repeat(50)}\n\n`;
+  for (const e of entries) {
+    const timeStr = e.start ? `[${e.start}${e.end ? ' - '+e.end : ''}]` : '';
+    const dur = calcDuration(e.start, e.end);
+    out += `${timeStr}${dur ? ' ('+dur+')' : ''} ${e.cat.toUpperCase()}\n  ${e.text}\n\n`;
+  }
+  const totalMins = calcTotalMins(entries);
+  if (totalMins > 0) {
+    const th = Math.floor(totalMins/60), tm = totalMins%60;
+    out += `${'─'.repeat(50)}\nTotal tracked: ${th > 0 ? th+'h ' : ''}${tm > 0 ? tm+'m' : ''}\n`;
+  }
+  downloadText(out, `timesheet_${currentDate}.txt`, 'text/plain');
+  toast('Text file exported');
+}
+
+async function exportAllCSV() {
+  syncStatus('Fetching all entries…');
+  const { data, error } = await sb.from(TABLE).select('*').order('entry_date').order('created_at');
+  if (error) { syncStatus('Export failed: ' + error.message); return; }
+  if (!data || !data.length) { toast('No data to export.'); syncStatus(''); return; }
+
+  const rows = [['Date','Start','End','Duration','Category','Description']];
+  for (const row of data) {
+    const e = rowToEntry(row);
+    rows.push([row.entry_date, e.start||'', e.end||'', calcDuration(e.start,e.end)||'', e.cat, '"'+(e.text||'').replace(/"/g,'""')+'"']);
+  }
+  downloadText(rows.map(r=>r.join(',')).join('\n'), `timesheet_all.csv`, 'text/csv');
+  syncStatus('');
+  toast('All days exported');
+}
+
+function downloadText(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ── Init ─────────────────────────────────────────────────────────
+document.getElementById('taskInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addEntry(); }
+});
+
+document.getElementById('editModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('editModal')) closeModal();
+});
+
+document.getElementById('startTime').value = nowTime();
+
+fetchDay(currentDate).then(render);
+</script>
+</body>
+</html>
