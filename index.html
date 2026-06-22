@@ -1060,6 +1060,16 @@ function safeSheet(name) {
   return name.replace(/[\/\\?\*\[\]]/g, '-').slice(0, 31);
 }
 
+function timesheetFooter(totalMins, employeeName) {
+  const dec = parseFloat(minsToDecimal(totalMins));
+  return [
+    [''],
+    ['I agree times, hours and work activities are accurate.', '', '', 'TOTAL:', dec, ''],
+    [''],
+    [`Employee Signature: ${employeeName}`, '', '', '', '', ''],
+  ];
+}
+
 function makeWorkbook(rows, colWidths, sheetName) {
   const ws = XLSX.utils.aoa_to_sheet(rows);
   ws['!cols'] = colWidths.map(w => ({ wch: w }));
@@ -1090,17 +1100,21 @@ async function exportCompiled() {
   const year = currentDate.split('-')[0];
   const name = getEmployeeName();
   const rows = timesheetHeader(year, name);
+  let grandTotal = 0;
 
   for (const date of Object.keys(byDate).sort()) {
     const dayEntries = byDate[date];
     const meta       = metaMap[date] || {};
     const totalMins  = dayEntries.reduce((s,e) => s + parseDuration(e.duration||''), 0);
+    grandTotal += totalMins;
     const desc       = dayEntries.map(e => e.description).filter(Boolean).join('; ');
     const [y,m,d]    = date.split('-').map(Number);
     const dateStr    = `${m}/${d}/${String(y).slice(2)}`;
     rows.push([dateStr, formatTime12(meta.day_start), formatTime12(meta.day_end), totalMins > 0 ? parseFloat(minsToDecimal(totalMins)) : '', '', desc]);
-    rows.push(['']); // blank row between days like their template
+    rows.push(['']);
   }
+
+  rows.push(...timesheetFooter(grandTotal, name));
 
   try {
     XLSX.writeFile(makeWorkbook(rows, [10,10,10,10,4,70], `Compiled`), `timesheet_compiled_${start}_${end}.xlsx`);
@@ -1131,9 +1145,11 @@ async function exportDetailed() {
     ['']
   ];
 
+  let grandTotal = 0;
   for (const r of (entriesRes.data||[])) {
     const meta    = metaMap[r.entry_date] || {};
     const mins    = parseDuration(r.duration||'');
+    grandTotal += mins;
     const [y,m,d] = r.entry_date.split('-').map(Number);
     rows.push([
       `${m}/${d}/${String(y).slice(2)}`,
@@ -1144,6 +1160,8 @@ async function exportDetailed() {
       r.description||''
     ]);
   }
+
+  rows.push(...timesheetFooter(grandTotal, name));
 
   try {
     XLSX.writeFile(makeWorkbook(rows, [10,10,10,10,12,60], `Detailed`), `timesheet_detailed_${start}_${end}.xlsx`);
