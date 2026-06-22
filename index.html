@@ -1105,12 +1105,18 @@ async function exportCompiled() {
   for (const date of Object.keys(byDate).sort()) {
     const dayEntries = byDate[date];
     const meta       = metaMap[date] || {};
-    const totalMins  = dayEntries.reduce((s,e) => s + parseDuration(e.duration||''), 0);
-    grandTotal += totalMins;
-    const desc       = dayEntries.map(e => e.description).filter(Boolean).join('; ');
-    const [y,m,d]    = date.split('-').map(Number);
-    const dateStr    = `${m}/${d}/${String(y).slice(2)}`;
-    rows.push([dateStr, formatTime12(meta.day_start), formatTime12(meta.day_end), totalMins > 0 ? parseFloat(minsToDecimal(totalMins)) : '', '', desc]);
+    // Duration = time out minus time in (day hours), not task sum
+    let dayMins = 0;
+    if (meta.day_start && meta.day_end) {
+      const [sh,sm] = meta.day_start.split(':').map(Number);
+      const [eh,em] = meta.day_end.split(':').map(Number);
+      dayMins = Math.max(0, (eh*60+em) - (sh*60+sm));
+    }
+    grandTotal += dayMins;
+    const desc    = dayEntries.map(e => e.description).filter(Boolean).join('; ');
+    const [y,m,d] = date.split('-').map(Number);
+    const dateStr = `${m}/${d}/${String(y).slice(2)}`;
+    rows.push([dateStr, formatTime12(meta.day_start), formatTime12(meta.day_end), dayMins > 0 ? parseFloat(minsToDecimal(dayMins)) : '', '', desc]);
     rows.push(['']);
   }
 
@@ -1141,20 +1147,17 @@ async function exportDetailed() {
     ['North Star Historical Conservancy'],
     ['Julia Morgan - Est 1905'],
     [''],[''],[''],
-    ['Date','Time In','Time Out','Duration','Category',`Employee: ${name} ${year}`],
+    ['Date','Duration','Category',`Employee: ${name} ${year}`],
     ['']
   ];
 
   let grandTotal = 0;
   for (const r of (entriesRes.data||[])) {
-    const meta    = metaMap[r.entry_date] || {};
     const mins    = parseDuration(r.duration||'');
     grandTotal += mins;
     const [y,m,d] = r.entry_date.split('-').map(Number);
     rows.push([
       `${m}/${d}/${String(y).slice(2)}`,
-      formatTime12(meta.day_start),
-      formatTime12(meta.day_end),
       mins > 0 ? parseFloat(minsToDecimal(mins)) : '',
       r.category,
       r.description||''
@@ -1164,7 +1167,7 @@ async function exportDetailed() {
   rows.push(...timesheetFooter(grandTotal, name));
 
   try {
-    XLSX.writeFile(makeWorkbook(rows, [10,10,10,10,12,60], `Detailed`), `timesheet_detailed_${start}_${end}.xlsx`);
+    XLSX.writeFile(makeWorkbook(rows, [10,10,12,60], `Detailed`), `timesheet_detailed_${start}_${end}.xlsx`);
     syncState('saved');
     toast('Detailed exported');
   } catch(e) { syncState('error'); toast('Export failed: ' + e.message); }
